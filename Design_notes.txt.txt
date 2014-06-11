@@ -1,0 +1,31 @@
+1. The bluetooth pairing pin is: 4545
+2. The ioio board connection is one connected once after Walle starts. To reset ioio connection, unpower the ioio board and stop the walle app.
+3. wheel drive calculation: -90-0-90 (1, -1)-(1, 1)-(-1, 1)
+
+Todos:
+Software:
+1. blocking detection, reaction  - detection is done, reaction -stop, can add more
+2. random move - no fix
+3. camera nav
+4. survey areas -- replaced by record done
+5. sweep area	-- sweep square done
+6. blade control, speed, blocking detection
+7. Home detection
+8. Command optimization
+9. location calculation -- done
+10. location calibration related to home
+11. IOIO board status feedback -- done
+
+Hardware:
+1. Blade motor
+2. Blade
+3. blade guard
+4. Phone mount
+5. Eyes
+6. Arm
+7. Body box
+8. Step motor control
+9. encoding wheel mount
+10. 
+
+
