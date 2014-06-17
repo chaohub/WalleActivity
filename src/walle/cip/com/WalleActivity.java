@@ -29,10 +29,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class WalleActivity extends IOIOActivity implements OnInitListener {
+public class WalleActivity extends IOIOActivity implements OnInitListener, OnSeekBarChangeListener {
 	public TextView mLocalTV, mIoioTV, mStatusTV;
 	public ImageView iView;
 	public ToggleButton mToggleButton1;
@@ -83,6 +85,10 @@ public class WalleActivity extends IOIOActivity implements OnInitListener {
 		tts = new TextToSpeech(this, this);
 		mNav = new Navigator(this.getApplicationContext());
 		setSever();		//start server by default
+
+		SeekBar bar = (SeekBar)findViewById(R.id.seekBar1); // make seekbar object
+		bar.setProgress(50);
+        bar.setOnSeekBarChangeListener(this); // set seekbar listener.
 
 		// this is the view on which you will listen for touch events
 		iView.setOnTouchListener(new View.OnTouchListener() {
@@ -317,6 +323,12 @@ public class WalleActivity extends IOIOActivity implements OnInitListener {
 											speak(commandParse[1]);
 										} else if (commandParse[0].contains("move")) {
 											autoMove(commandParse[1]);
+										} else if (commandParse[0].contains("turn")) {
+											int a = Integer.parseInt(commandParse[1]);
+											mDrv.turnHead(a);
+										} else if (commandParse[0].contains("mow")) {
+											int m = Integer.parseInt(commandParse[1]);
+											mDrv.mower = m==1? true:false;
 										} else if (commandParse[0].contains("stop")) {
 											stop();
 										} else if (commandParse[0].contains("test")) {
@@ -450,5 +462,24 @@ public class WalleActivity extends IOIOActivity implements OnInitListener {
 			mSendBuf.println(cmd);
 			mSendBuf.flush();
 		}
+	}
+
+	@Override
+	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+		// TODO Auto-generated method stub
+		String cmd = "turn:" + arg1;
+		sendCmd(cmd);
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+		
 	}
 }

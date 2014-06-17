@@ -13,8 +13,8 @@ class Driver extends BaseIOIOLooper {
 	static final String TAG = "WalleDrv";
 
 	// ioio settings
-	private PwmOutput E1, E2;
-	private DigitalOutput L1, L2, L3, L4;
+	private PwmOutput E1, E2, E3, P1, BL;
+	private DigitalOutput L1, L2, L3, L4, L5, L6;
 	private AnalogInput mWheelIn;
 
 	// Wheel encoder variables
@@ -23,7 +23,7 @@ class Driver extends BaseIOIOLooper {
 	boolean lastState = false;
 	private static final float AVERAGE = 0.965f;
 	private static final float THRETHOLD = 0.005f;
-	private static final int POLLPERIOD = 50;	// IOIO board poll every 200ms
+	private static final int POLLPERIOD = 50;	// IOIO board poll every 50ms
 	private int mNumNoMove = 0;
 	
 	// Analog driving settings
@@ -36,7 +36,10 @@ class Driver extends BaseIOIOLooper {
 	public float leftDrive;
 	public float rightDrive;
 	public boolean connected = false;
+	public boolean mower = false;
 	private float mSpeed;
+	private float turn = 0.075f;
+	private byte eye = 0;
 	
 	private Navigator mNav;
 
@@ -49,19 +52,30 @@ class Driver extends BaseIOIOLooper {
 	@Override
 	public void setup() throws ConnectionLostException {
 		try {
-			// pin 12, 14 damaged
+			// driving motor control
 			E2 = ioio_.openPwmOutput(28, 256); // right wheel drive strength
 			E1 = ioio_.openPwmOutput(27, 256); // left wheel drive strength
-
-			// pin 24 damaged
 			L1 = ioio_.openDigitalOutput(21, false); // left wheel forward
 			L2 = ioio_.openDigitalOutput(22, false); // left wheel backward
 			L3 = ioio_.openDigitalOutput(23, false); // right wheel forward
 			L4 = ioio_.openDigitalOutput(24, false); // right wheel backward
-
+			
+			// mower motor control
+			E3 = ioio_.openPwmOutput(30, 256); // right wheel drive strength
+			L5 = ioio_.openDigitalOutput(25, false); // right wheel forward
+			L6 = ioio_.openDigitalOutput(26, false); // right wheel backward
+			E3.setDutyCycle(1.0f);
+			
+			// Encoding wheel
 			// pin 45 white wire, pin 46 green wire
 			mWheelIn = ioio_.openAnalogInput(44);
 			mWheelIn.setBuffer(256); // allow buffer 64 samples at most
+
+			// Head control
+			P1 = ioio_.openPwmOutput(29, 50); // left wheel drive strength
+		
+			// eye led
+			BL = ioio_.openPwmOutput(31, 256); // right wheel drive strength
 
 			connected = true;
 			Log.w(TAG, "IOIO connection success");
@@ -97,10 +111,15 @@ class Driver extends BaseIOIOLooper {
 		
 		motor_control();
 		
+		P1.setDutyCycle(turn);
+		
 		if ((leftDrive != 0)|| (rightDrive != 0) || (steps != 0))
 			Log.i(TAG, "Direction=" + mNav.getOrientation() +", Turn=" + angle + ", step=" + steps
 					+ ", L=" + leftDrive + ", R=" + rightDrive + " overflow="+ overflow);
 
+		blink();
+		mower();
+		
 		try {
 			// This defines the looping frequency of ioio board
 			Thread.sleep(POLLPERIOD);
@@ -288,5 +307,41 @@ class Driver extends BaseIOIOLooper {
 			}
 		}
 		return true;
+	}
+	
+	// turn head left or right
+	public void turnHead(int f) {
+		turn = 0.035f + f/100.0f * 0.075f;
+		if (turn < 0.035) turn = 0.0375f;
+		else if (turn > 0.1125) turn = 0.1125f;
+	}
+	
+	public void blink() {
+		eye += 12;
+		float b = eye/256.0f;
+		try {
+			BL.setDutyCycle(b);
+Log.d(TAG, "blink = " + b);
+		} catch (ConnectionLostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void mower() {
+		try {
+			if (mower && (leftDrive + rightDrive > 0.5)) {
+				L5.write(true);
+				L6.write(false);
+			}
+			else {
+				L5.write(true);
+				L6.write(true);			
+			}
+		} catch (ConnectionLostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
 	}
 }

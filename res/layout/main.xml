@@ -75,9 +75,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/textView2"
+        android:layout_alignRight="@+id/textView1"
         android:layout_below="@+id/editText1"
         android:onClick="onSendClicked"
         android:text="Send" />
+
+    <SeekBar
+        android:id="@+id/seekBar1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/button1"
+        android:layout_toRightOf="@+id/textView2"
+        android:max="100" />
 
 </RelativeLayout>

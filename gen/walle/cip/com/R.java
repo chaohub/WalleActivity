@@ -20,6 +20,7 @@ public final class R {
         public static final int button1=0x7f050007;
         public static final int editText1=0x7f050006;
         public static final int imageView1=0x7f050003;
+        public static final int seekBar1=0x7f050008;
         public static final int server_status=0x7f050001;
         public static final int textView1=0x7f050002;
         public static final int textView2=0x7f050004;
